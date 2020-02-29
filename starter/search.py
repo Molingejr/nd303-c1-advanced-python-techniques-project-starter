@@ -37,6 +37,9 @@ class Query(object):
         # TODO: What instance variables will be useful for storing on the Query object?
         self.number = kwargs.get('number')
         self.date = kwargs.get('date')
+        self.start_date = kwargs.get('start_date')
+        self.end_date = kwargs.get('end_date')
+        self.filter = kwargs.get('filter')
         self.return_object = kwargs.get('return_object')
 
     def build_query(self):
@@ -48,8 +51,10 @@ class Query(object):
         """
 
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
-
-        date_search = Query.DateSearch(DateSearch.equals.name, self.date)
+        if self.date:
+            date_search = Query.DateSearch(DateSearch.equals.name, self.date)
+        else:
+            date_search = Query.DateSearch(DateSearch.between.name, [self.start_date, self.end_date])
 
         return_object = Query.ReturnObjects.get(self.return_object)
 
