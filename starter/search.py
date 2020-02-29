@@ -144,9 +144,14 @@ class NEOSearcher(object):
         self.date_search = query.date_search.type
         date = query.date_search.values
 
-        neos = self.return_date_search_equal(self.orbit_date, date)
+        neos = []
 
-        return neos
+        if self.date_search == DateSearch.between.name:
+            neos = self.return_date_search_between(self.orbit_date, date[0], date[1])
+        elif self.date_search == DateSearch.equals.name:
+            neos = self.return_date_search_equal(self.orbit_date, date)
+
+        return neos[: int(query.number)]
 
     @staticmethod
     def return_date_search_equal(orbit_path, date):
@@ -154,3 +159,11 @@ class NEOSearcher(object):
         for k, v in orbit_path.items():
             neos_date_equal = neos_date_equal + v if k == date else neos_date_equal
         return neos_date_equal
+
+    @staticmethod
+    def return_date_search_between(orbit_path, start_date, end_date):
+        neos_date_between = []
+        for k, v in orbit_path.items():
+            if start_date <= k <= end_date:
+                neos_date_between += v
+        return neos_date_between
