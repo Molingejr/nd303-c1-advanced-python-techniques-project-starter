@@ -35,6 +35,9 @@ class Query(object):
         :param kwargs: dict of search query parameters to determine which SearchOperation query to use
         """
         # TODO: What instance variables will be useful for storing on the Query object?
+        self.number = kwargs.get('number')
+        self.date = kwargs.get('date')
+        self.return_object = kwargs.get('return_object')
 
     def build_query(self):
         """
@@ -45,6 +48,14 @@ class Query(object):
         """
 
         # TODO: Translate the query parameters into a QueryBuild.Selectors object
+
+        date_search = Query.DateSearch(DateSearch.equals.name, self.date)
+
+        return_object = Query.ReturnObjects.get(self.return_object)
+
+        filters = []
+
+        return Query.Selectors(date_search, self.number, filters, return_object)
 
 
 class Filter(object):
@@ -106,6 +117,8 @@ class NEOSearcher(object):
         """
         self.db = db
         # TODO: What kind of an instance variable can we use to connect DateSearch to how we do search?
+        self.orbit_date = dict(db.orbit_date)
+        self.date_search = None
 
     def get_objects(self, query):
         """
@@ -122,3 +135,17 @@ class NEOSearcher(object):
         # TODO: Write instance methods that get_objects can use to implement the two types of DateSearch your project
         # TODO: needs to support that then your filters can be applied to. Remember to return the number specified in
         # TODO: the Query.Selectors as well as in the return_type from Query.Selectors
+
+        self.date_search = query.date_search.type
+        date = query.date_search.values
+
+        neos = self.return_date_search_equal(self.orbit_date, date)
+
+        return neos
+
+    @staticmethod
+    def return_date_search_equal(orbit_path, date):
+        neos_date_equal = []
+        for k, v in orbit_path.items():
+            neos_date_equal = neos_date_equal + v if k == date else neos_date_equal
+        return neos_date_equal
